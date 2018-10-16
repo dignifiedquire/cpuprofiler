@@ -5,7 +5,7 @@
 //! ```
 //! use cpuprofiler::heap_profiler::HEAP_PROFILER;
 //!
-//! HEAP_PROFILER.lock().unwrap().start("./my-heap-prof.profile");
+//! HEAP_PROFILER.lock().unwrap().start("./my-prof.hprof");
 //! // Code you want to sample goes here!
 //! HEAP_PROFILER.lock().unwrap().stop();
 //! ```
@@ -14,14 +14,13 @@
 //! We limit access this way to ensure that only one profiler is running at a time -
 //! this is a limitation of the heap-profiler library.
 
+use error::{Error, ErrorKind};
+use state::ProfilerState;
 use std::ffi::CString;
 use std::fs::File;
 use std::os::raw::c_char;
+use std::os::raw::c_void;
 use std::path::Path;
-
-use error::{Error, ErrorKind};
-use state::ProfilerState;
-
 use std::sync::Mutex;
 
 lazy_static! {
@@ -43,6 +42,11 @@ extern "C" {
     fn HeapProfilerStop();
 
     fn HeapProfilerDump(resaon: *const c_char);
+
+    pub fn tc_memalign(alignment: usize, size: usize) -> *mut c_void;
+    pub fn tc_free(ptr: *mut c_void);
+// buggy, but why is that?
+// pub fn tc_free_sized(ptr: *mut c_void, size: usize);
 }
 
 /// The `HeapProfiler`
@@ -119,6 +123,13 @@ impl HeapProfiler {
         }
     }
 
+    /// # Examples
+    ///
+    /// ```
+    /// use cpuprofiler::heap_profiler::HEAP_PROFILER;
+    ///
+    /// HEAP_PROFILER.lock().unwrap().dump("hello.hprof").unwrap();
+    /// ```
     pub fn dump<T: Into<Vec<u8>>>(&mut self, reason: T) -> Result<(), Error> {
         let c_reason = try!(CString::new(reason));
         try!(check_file_path(c_reason.clone().into_string().unwrap()));

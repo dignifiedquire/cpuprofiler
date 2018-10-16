@@ -12,4 +12,3 @@ license = "BSD-2-Clause"
 [dependencies]
 lazy_static = "0.2.1"
 error-chain = "0.10.0"
-tcmalloc = { git = "https://github.com/jmcomets/tcmalloc-rs" }
