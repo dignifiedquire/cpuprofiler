@@ -1,14 +1,14 @@
 [package]
-name = "cpuprofiler"
-version = "0.0.3"
-authors = ["james <LucasJ94@hotmail.co.uk>"]
+name = "gperftools"
+version = "0.1.0"
+authors = ["dignifiedquire <dignifiedquire@gmail.com>", "james <LucasJ94@hotmail.co.uk>"]
 
-description = "Bindings to google's cpu profiler"
-repository = "https://github.com/AtheMathmo/cpuprofiler"
-keywords = ["cpu", "profiler", "cpuprofiler"]
+description = "Bindings to google's gperftools"
+repository = "https://github.com/dignifiedquire/rust-gperftools"
+keywords = ["cpu", "profiler", "cpuprofiler", "heap", "heapprofiler", "memoryprofiler", "gperftools"]
 readme = "README.md"
 license = "BSD-2-Clause"
 
 [dependencies]
-lazy_static = "0.2.1"
-error-chain = "0.10.0"
+lazy_static = "1.1.0"
+error-chain = "0.12.0"

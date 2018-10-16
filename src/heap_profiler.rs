@@ -3,7 +3,7 @@
 //! # Usage
 //!
 //! ```
-//! use cpuprofiler::heap_profiler::HEAP_PROFILER;
+//! use gperftools::heap_profiler::HEAP_PROFILER;
 //!
 //! HEAP_PROFILER.lock().unwrap().start("./my-prof.hprof");
 //! // Code you want to sample goes here!
@@ -65,7 +65,7 @@ impl HeapProfiler {
     /// # Examples
     ///
     /// ```
-    /// use cpuprofiler::heap_profiler::HEAP_PROFILER;
+    /// use gperftools::heap_profiler::HEAP_PROFILER;
     ///
     /// println!("{}", HEAP_PROFILER.lock().unwrap().state());
     /// ```
@@ -88,7 +88,7 @@ impl HeapProfiler {
     /// - `fname` is not valid Utf8.
     /// - `fname` is not a file.
     /// - The user does not have write access to the file.
-    /// - An internal failure from the cpuprofiler library.
+    /// - An internal failure from the gperftools library.
     pub fn start<T: Into<Vec<u8>>>(&mut self, fname: T) -> Result<(), Error> {
         if self.state == ProfilerState::NotActive {
             let c_fname = try!(CString::new(fname));
@@ -126,7 +126,7 @@ impl HeapProfiler {
     /// # Examples
     ///
     /// ```
-    /// use cpuprofiler::heap_profiler::HEAP_PROFILER;
+    /// use gperftools::heap_profiler::HEAP_PROFILER;
     ///
     /// HEAP_PROFILER.lock().unwrap().dump("hello.hprof").unwrap();
     /// ```

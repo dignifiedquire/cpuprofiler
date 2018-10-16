@@ -1,6 +1,8 @@
-# CPU Profiler
+# Gperftools for Rust
 
-This library provides bindings to google's [cpuprofiler](http://goog-perftools.sourceforge.net/doc/cpu_profiler.html).
+> This code is an extension of the work in [AtheMathmo/cpuprofiler](https://github.com/AtheMathmo/cpuprofiler).
+
+This library provides bindings to google's [cpuprofiler](http://goog-perftools.sourceforge.net/doc/cpu_profiler.html) and [heapprofiler](http://goog-perftools.sourceforge.net/doc/heapprofile.html).
 
 ## Why use this?
 
@@ -10,6 +12,7 @@ This library certainly doesn't replace those but adds a some different tools to 
 - Makes it easy to profile only sections of code
 - Uses statistical sampling (like [oprofiler](http://oprofile.sourceforge.net/news/)) which means low overhead
 - Works with [pprof](https://github.com/google/pprof) for a range of output formats
+- Allows memory profiling out of the box (on linux)
 
 ## Installation
 
@@ -22,35 +25,44 @@ in their repository but it's roughly the following:
 
 There may be some other dependencies for your system - these are explained well in their
 [INSTALL](https://github.com/gperftools/gperftools/blob/master/INSTALL) document.
-For example [libunwind](http://download.savannah.gnu.org/releases/libunwind/) (> 0.99.0) is required for 64 bit systems.
+For example r[libunwind](http://download.savannah.gnu.org/releases/libunwind/) (> 0.99.0) is required for 64 bit systems.
 
 ## Usage
 
-Add `cpuprofiler` to your `Cargo.toml` manifest.
+Add `gperftools` to your `Cargo.toml` manifest.
 
 ```
 [dependencies]
-cpuprofiler = "0.0.3"
+gperftools = "0.1.0"
 ```
 
 Add the dependency to your root:
 
 ```
-extern crate cpuprofiler;
+extern crate gperftools;
 ```
 
 Start and stop the profiler around the code you'd like to draw samples.
 This will save the profile to a file you specify.
 
 ```rust
-use cpuprofiler::PROFILER;
+// CPU
+use gperftools::profiler::PROFILER;
 
-PROFILER.lock().unwrap().start("./my-prof.profile").unwrap();
+PROFILER.lock().unwrap().start("./my-prof.prof").unwrap();
 // Code you want to sample goes here!
 PROFILER.lock().unwrap().stop().unwrap();
+
+// HEAP
+use gperftools::heap_profiler::HEAP_PROFILER;
+
+HEAP_PROFILER.lock().unwrap().start("./my-prof.hprof").unwrap();
+// Code you want to sample goes here!
+HEAP_PROFILER.lock().unwrap().stop().unwrap();
+
 ```
 
-Now you can just run the code as you would normally. Once complete the profile will be saved to `./my-prof.profile`.
+Now you can just run the code as you would normally. Once complete the profile will be saved to `./my-prof.prof`.
 
 The final step is the fun part - analyzing the profile!
 
@@ -60,6 +72,10 @@ To analyze the profile we use google's [pprof](https://github.com/google/pprof) 
 
 An old version of this tool is included with the gperftools package. This is the version I have been using but the newer Go version should work too!
 The usage of pprof is well documented in the [cpuprofiler docs](http://goog-perftools.sourceforge.net/doc/cpu_profiler.html).
+
+If you have issues with smybols not being displayed make sure
+- you enable debug symbols (`RUSTFLAGS=-g`)
+- `llvm-symbolize` is in your path
 
 ## The Result
 
@@ -95,9 +111,8 @@ In the above we see that there were 513 samples in the `compute_grad` function a
 ### TODO
 
 - Better crate documentation
-- Expose other functions from google's cpuprofiler. This allows more options, status checks and more.
-- Can we write a sampling profiler in Rust?!
-- Integration with cargo-profiler?
+- Expose other functions
+- Safe guard memory profiling behind a flag, to allow for cpu profiling without the custom allocator.
 
 ## License
 

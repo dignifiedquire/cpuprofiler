@@ -1,6 +1,6 @@
 //! Cpu Profiler
 //!
-//! This crate provides safe bindings to google's cpuprofiler library.
+//! This crate provides safe bindings to google's gperftools library.
 //! This allows us to use statistical sampling to profile sections of code
 //! and consume the output in a number of ways using [pprof](https://github.com/google/pprof).
 //!
@@ -20,7 +20,7 @@
 //! # Usage
 //!
 //! ```
-//! use cpuprofiler::profiler::PROFILER;
+//! use gperftools::profiler::PROFILER;
 //!
 //! PROFILER.lock().unwrap().start("./my-prof.profile");
 //! // Code you want to sample goes here!
@@ -29,7 +29,7 @@
 //!
 //! The profiler is accessed via the static `PROFILER: Mutex<Profiler>`.
 //! We limit access this way to ensure that only one profiler is running at a time -
-//! this is a limitation of the cpuprofiler library.
+//! this is a limitation of the gperftools library.
 
 use std::ffi::CString;
 use std::fs::File;
@@ -44,7 +44,7 @@ use std::sync::Mutex;
 lazy_static! {
     /// Static reference to the PROFILER
     ///
-    /// The cpuprofiler library only supports one active profiler.
+    /// The gperftools library only supports one active profiler.
     /// Because of this we must use static access and wrap in a `Mutex`.
     #[derive(Debug)]
     pub static ref PROFILER: Mutex<Profiler> = Mutex::new(Profiler {
@@ -62,7 +62,7 @@ extern "C" {
 
 /// The `Profiler`
 ///
-/// The `Profiler` gives access to the _cpuprofiler_ library.
+/// The `Profiler` gives access to the _gperftools_ library.
 /// By storing the state of the profiler and limiting access
 /// we make the FFI safer.
 #[derive(Debug)]
@@ -76,7 +76,7 @@ impl Profiler {
     /// # Examples
     ///
     /// ```
-    /// use cpuprofiler::profiler::PROFILER;
+    /// use gperftools::profiler::PROFILER;
     ///
     /// println!("{}", PROFILER.lock().unwrap().state());
     /// ```
@@ -99,7 +99,7 @@ impl Profiler {
     /// - `fname` is not valid Utf8.
     /// - `fname` is not a file.
     /// - The user does not have write access to the file.
-    /// - An internal failure from the cpuprofiler library.
+    /// - An internal failure from the gperftools library.
     pub fn start<T: Into<Vec<u8>>>(&mut self, fname: T) -> Result<(), Error> {
         if self.state == ProfilerState::NotActive {
             let c_fname = try!(CString::new(fname));
