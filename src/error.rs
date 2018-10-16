@@ -1,8 +1,8 @@
 //! Error handling for the cpuprofiler thanks to error_chain!
 
-use ProfilerState;
-use std::io;
+use state::ProfilerState;
 use std::ffi;
+use std::io;
 use std::str;
 
 error_chain! {
