@@ -66,6 +66,10 @@ Now you can just run the code as you would normally. Once complete the profile w
 
 The final step is the fun part - analyzing the profile!
 
+### Heap Profiling
+
+To use the heap profiler, a custom allocator is used. This feature requires a nightly compiler for now and setting the feature `heap`, to enable.
+
 ### Analyzing the profile
 
 To analyze the profile we use google's [pprof](https://github.com/google/pprof) tool.
@@ -112,7 +116,6 @@ In the above we see that there were 513 samples in the `compute_grad` function a
 
 - Better crate documentation
 - Expose other functions
-- Safe guard memory profiling behind a flag, to allow for cpu profiling without the custom allocator.
 
 ## License
 
