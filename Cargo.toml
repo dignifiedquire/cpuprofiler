@@ -5,7 +5,7 @@ authors = ["dignifiedquire <dignifiedquire@gmail.com>", "james <LucasJ94@hotmail
 
 description = "Bindings to google's gperftools"
 repository = "https://github.com/dignifiedquire/rust-gperftools"
-keywords = ["cpu", "profiler", "cpuprofiler", "heap", "heapprofiler", "memoryprofiler", "gperftools"]
+keywords = ["profiler", "cpuprofiler", "heapprofiler", "memoryprofiler", "gperftools"]
 readme = "README.md"
 license = "BSD-2-Clause"
 
