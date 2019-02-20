@@ -26,7 +26,7 @@
 //! - `HEAP_PROFILE_ALLOCATION_INTERVAL` (Default: 1GB) - If non-zero, dump heap profiling information once every specified number of bytes allocated by the program since the last dump.
 //! - `HEAP_PROFILE_DEALLOCATION_INTERVAL` (Default: 0) - If non-zero, dump heap profiling information once every specified number of bytes deallocated by the program since the last dump.
 //! - `HEAP_PROFILE_INUSE_INTERVAL` (Default: 100MB) - If non-zero, dump heap profiling information whenever the high-water memory usage mark increases by the specified number of bytes.
-//! - `HEAP_PROFILE_INUSE_INTERVAL` (Default: 0) - If non-zero, dump heap profiling information once every specified number of seconds since the last dump.
+//! - `HEAP_PROFILE_TIME_INTERVAL` (Default: 0) - If non-zero, dump heap profiling information once every specified number of seconds since the last dump.
 //! - `HEAP_PROFILE_MMAP_LOG` (Default: false) - Should mmap/munmap calls be logged?
 //! - `HEAP_PROFILE_MMAP` (Default: false) - If heap-profiling is on, also profile mmap, mremap, and sbrk
 //! - `HEAP_PROFILE_ONLY_MMAP` (Default: false) - If heap-profiling is on, only profile mmap, mremap, and sbrk; do not profile malloc/new/etc
