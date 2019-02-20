@@ -1,5 +1,7 @@
 # Gperftools for Rust
 
+[![crates.io version][crate-shield]][crate] [![Docs][docs-shield]][docs]
+
 > This code is an extension of the work in [AtheMathmo/cpuprofiler](https://github.com/AtheMathmo/cpuprofiler).
 
 This library provides bindings to Google's [gperftools](https://github.com/gperftools/gperftools).
@@ -124,3 +126,8 @@ In the above we see that there were 513 samples in the `compute_grad` function a
 ## License
 
 This project has a BSD license to match the gperftools license. Which makes sense, I think?
+
+[docs-shield]: https://img.shields.io/badge/docs-online-blue.svg?style=flat-square
+[docs]: https://docs.rs/crate/gperftools/
+[crate-shield]: https://img.shields.io/crates/v/gperftools.svg?style=flat-square
+[crate]: https://crates.io/crates/gperftools
