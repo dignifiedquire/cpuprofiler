@@ -1,5 +1,4 @@
 #![warn(missing_debug_implementations)]
-#![cfg_attr(feature = "heap", feature(allocator_api))]
 
 #[macro_use]
 extern crate error_chain;
@@ -7,15 +6,18 @@ extern crate error_chain;
 extern crate lazy_static;
 
 mod state;
-#[cfg(feature = "heap")]
-mod tcmalloc;
+mod util;
 
 pub mod error;
 pub mod profiler;
 
-#[cfg(feature = "heap")]
-pub mod heap_profiler;
+pub use profiler::*;
 
 #[cfg(feature = "heap")]
-#[global_allocator]
+pub mod heap_profiler;
+#[cfg(feature = "heap")]
+pub use heap_profiler::*;
+#[cfg(feature = "heap")]
+mod tcmalloc;
+#[cfg(feature = "heap")]
 static GLOBAL: tcmalloc::TCMalloc = tcmalloc::TCMalloc;

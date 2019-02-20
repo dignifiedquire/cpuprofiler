@@ -21,5 +21,9 @@ error_chain! {
             description("Operation is invalid for profiler state")
             display("Operation is invalid for profiler state: {}", state)
         }
+        InvalidPath {
+            description("Invalid path")
+            display("Invalid path provided")
+        }
     }
 }

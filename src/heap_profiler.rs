@@ -1,27 +1,47 @@
 //! Heap Profiler
 //!
+//!
 //! # Usage
 //!
 //! ```
-//! use gperftools::heap_profiler::HEAP_PROFILER;
+//! use gperftools::HEAP_PROFILER;
 //!
-//! HEAP_PROFILER.lock().unwrap().start("./my-prof.hprof");
-//! // Code you want to sample goes here!
+//! // Start profiling
+//! HEAP_PROFILER.lock().unwrap().start("./my-profile.mprof");
+//!
+//! {
+//!   // do some work
+//!   let v = vec![1; 1000];
+//!   println!("{:?}", v);
+//!   // sleep a bit so we have time to profile
+//!   std::thread::sleep_ms(1000);
+//! }
+//!
+//! // stop profiling
 //! HEAP_PROFILER.lock().unwrap().stop();
 //! ```
+//!
+//! The following environment flags can change the behaviour of the profiler.
+//!
+//! - `HEAP_PROFILE_ALLOCATION_INTERVAL` (Default: 1GB) - If non-zero, dump heap profiling information once every specified number of bytes allocated by the program since the last dump.
+//! - `HEAP_PROFILE_DEALLOCATION_INTERVAL` (Default: 0) - If non-zero, dump heap profiling information once every specified number of bytes deallocated by the program since the last dump.
+//! - `HEAP_PROFILE_INUSE_INTERVAL` (Default: 100MB) - If non-zero, dump heap profiling information whenever the high-water memory usage mark increases by the specified number of bytes.
+//! - `HEAP_PROFILE_INUSE_INTERVAL` (Default: 0) - If non-zero, dump heap profiling information once every specified number of seconds since the last dump.
+//! - `HEAP_PROFILE_MMAP_LOG` (Default: false) - Should mmap/munmap calls be logged?
+//! - `HEAP_PROFILE_MMAP` (Default: false) - If heap-profiling is on, also profile mmap, mremap, and sbrk
+//! - `HEAP_PROFILE_ONLY_MMAP` (Default: false) - If heap-profiling is on, only profile mmap, mremap, and sbrk; do not profile malloc/new/etc
 //!
 //! The profiler is accessed via the static `HEAP_PROFILER: Mutex<HeapProfiler>`.
 //! We limit access this way to ensure that only one profiler is running at a time -
 //! this is a limitation of the heap-profiler library.
 
+use std::ffi::CString;
+use std::os::raw::{c_char, c_int};
+use std::sync::Mutex;
+
 use error::{Error, ErrorKind};
 use state::ProfilerState;
-use std::ffi::CString;
-use std::fs::File;
-use std::os::raw::c_char;
-use std::os::raw::c_void;
-use std::path::Path;
-use std::sync::Mutex;
+use util::check_file_path;
 
 lazy_static! {
     /// Static reference to the HEAP_PROFILER
@@ -42,10 +62,7 @@ extern "C" {
 
     fn HeapProfilerDump(resaon: *const c_char);
 
-    pub fn tc_memalign(alignment: usize, size: usize) -> *mut c_void;
-    pub fn tc_free(ptr: *mut c_void);
-// buggy, but why is that?
-// pub fn tc_free_sized(ptr: *mut c_void, size: usize);
+    fn IsHeapProfilerRunning() -> c_int;
 }
 
 /// The `HeapProfiler`
@@ -59,7 +76,7 @@ pub struct HeapProfiler {
 }
 
 impl HeapProfiler {
-    /// Returns the profiler state
+    /// Returns the profiler state.
     ///
     /// # Examples
     ///
@@ -70,6 +87,21 @@ impl HeapProfiler {
     /// ```
     pub fn state(&self) -> ProfilerState {
         self.state
+    }
+
+    /// Checks if the heap profiler is running.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use gperftools::heap_profiler::HEAP_PROFILER;
+    ///
+    /// println!("running? {}", HEAP_PROFILER.lock().unwrap().is_running());
+    /// ```
+    pub fn is_running(&self) -> bool {
+        let state = unsafe { IsHeapProfilerRunning() };
+
+        state == 1
     }
 
     /// Start the heap profiler
@@ -91,7 +123,7 @@ impl HeapProfiler {
     pub fn start<T: Into<Vec<u8>>>(&mut self, fname: T) -> Result<(), Error> {
         if self.state == ProfilerState::NotActive {
             let c_fname = try!(CString::new(fname));
-            try!(check_file_path(c_fname.clone().into_string().unwrap()));
+            check_file_path(c_fname.clone().into_string().unwrap())?;
             unsafe {
                 HeapProfilerStart(c_fname.as_ptr());
             }
@@ -122,28 +154,13 @@ impl HeapProfiler {
         }
     }
 
-    /// # Examples
-    ///
-    /// ```
-    /// use gperftools::heap_profiler::HEAP_PROFILER;
-    ///
-    /// HEAP_PROFILER.lock().unwrap().dump("hello.hprof").unwrap();
-    /// ```
+    /// Manually trigger a dump of the current profile.
     pub fn dump<T: Into<Vec<u8>>>(&mut self, reason: T) -> Result<(), Error> {
         let c_reason = try!(CString::new(reason));
-        try!(check_file_path(c_reason.clone().into_string().unwrap()));
+        check_file_path(c_reason.clone().into_string().unwrap())?;
         unsafe {
             HeapProfilerDump(c_reason.as_ptr());
         }
         Ok(())
-    }
-}
-
-fn check_file_path<P: AsRef<Path>>(path: P) -> Result<(), Error> {
-    let write_res = File::create(path);
-
-    match write_res {
-        Ok(_) => Ok(()),
-        Err(e) => Err(e.into()),
     }
 }

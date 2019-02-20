@@ -22,7 +22,7 @@
 //! ```
 //! use gperftools::profiler::PROFILER;
 //!
-//! PROFILER.lock().unwrap().start("./my-prof.profile");
+//! PROFILER.lock().unwrap().start("./my-profile.prof");
 //! // Code you want to sample goes here!
 //! PROFILER.lock().unwrap().stop();
 //! ```
@@ -32,14 +32,12 @@
 //! this is a limitation of the gperftools library.
 
 use std::ffi::CString;
-use std::fs::File;
 use std::os::raw::c_char;
-use std::path::Path;
+use std::sync::Mutex;
 
 use error::{Error, ErrorKind};
 use state::ProfilerState;
-
-use std::sync::Mutex;
+use util::check_file_path;
 
 lazy_static! {
     /// Static reference to the PROFILER
@@ -102,7 +100,7 @@ impl Profiler {
     pub fn start<T: Into<Vec<u8>>>(&mut self, fname: T) -> Result<(), Error> {
         if self.state == ProfilerState::NotActive {
             let c_fname = try!(CString::new(fname));
-            try!(check_file_path(c_fname.clone().into_string().unwrap()));
+            check_file_path(c_fname.clone().into_string().unwrap())?;
 
             unsafe {
                 let res = ProfilerStart(c_fname.as_ptr());
@@ -136,14 +134,5 @@ impl Profiler {
         } else {
             Err(ErrorKind::InvalidState(self.state).into())
         }
-    }
-}
-
-fn check_file_path<P: AsRef<Path>>(path: P) -> Result<(), Error> {
-    let write_res = File::create(path);
-
-    match write_res {
-        Ok(_) => Ok(()),
-        Err(e) => Err(e.into()),
     }
 }

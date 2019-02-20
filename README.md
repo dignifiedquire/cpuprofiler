@@ -2,17 +2,17 @@
 
 > This code is an extension of the work in [AtheMathmo/cpuprofiler](https://github.com/AtheMathmo/cpuprofiler).
 
-This library provides bindings to google's [cpuprofiler](http://goog-perftools.sourceforge.net/doc/cpu_profiler.html) and [heapprofiler](http://goog-perftools.sourceforge.net/doc/heapprofile.html).
+This library provides bindings to Google's [gperftools](https://github.com/gperftools/gperftools).
 
 ## Why use this?
 
 There are other profiling tools for Rust, [cargo-profiler](https://github.com/pegasos1/cargo-profiler) is particularly good!
 This library certainly doesn't replace those but adds a some different tools to the mix:
 
-- Makes it easy to profile only sections of code
-- Uses statistical sampling (like [oprofiler](http://oprofile.sourceforge.net/news/)) which means low overhead
-- Works with [pprof](https://github.com/google/pprof) for a range of output formats
-- Allows memory profiling out of the box (on linux)
+- Makes it easy to profile only sections of code.
+- Uses statistical sampling wwhich means low overhead.
+- Works with [pprof](https://github.com/google/pprof) for a range of output formats.
+- Allows memory profiling out of the box (on linux and macOS).
 
 ## Installation
 
@@ -25,7 +25,7 @@ in their repository but it's roughly the following:
 
 There may be some other dependencies for your system - these are explained well in their
 [INSTALL](https://github.com/gperftools/gperftools/blob/master/INSTALL) document.
-For example r[libunwind](http://download.savannah.gnu.org/releases/libunwind/) (> 0.99.0) is required for 64 bit systems.
+For example [libunwind](http://download.savannah.gnu.org/releases/libunwind/) (> 0.99.0) is required for 64 bit systems.
 
 ## Usage
 
@@ -44,6 +44,7 @@ extern crate gperftools;
 
 Start and stop the profiler around the code you'd like to draw samples.
 This will save the profile to a file you specify.
+
 
 ```rust
 // CPU
@@ -68,18 +69,21 @@ The final step is the fun part - analyzing the profile!
 
 ### Heap Profiling
 
-To use the heap profiler, a custom allocator is used. This feature requires a nightly compiler for now and setting the feature `heap`, to enable.
+To use the heap profiler, a custom allocator is used. This feature requires setting the feature `heap`, to enable it. When enabled the global allocator will be changed to use tcmalloc, which is required for gperftools to analyse allocations.
+
+You can find additional documentation about heap profiling [here](https://gperftools.github.io/gperftools/heapprofile.html).
 
 ### Analyzing the profile
 
-To analyze the profile we use google's [pprof](https://github.com/google/pprof) tool.
+To analyze the profile use Google's [pprof](https://github.com/google/pprof) tool.
 
-An old version of this tool is included with the gperftools package. This is the version I have been using but the newer Go version should work too!
-The usage of pprof is well documented in the [cpuprofiler docs](http://goog-perftools.sourceforge.net/doc/cpu_profiler.html).
+You can find some documentation on how to use it with gperftools [here](https://gperftools.github.io/gperftools/cpuprofile.html).
 
 If you have issues with smybols not being displayed make sure
 - you enable debug symbols (`RUSTFLAGS=-g`)
 - `llvm-symbolize` is in your path
+
+
 
 ## The Result
 
