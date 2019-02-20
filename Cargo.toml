@@ -16,3 +16,6 @@ error-chain = "0.12.0"
 [features]
 default = []
 heap = []
+
+[build-dependencies]
+pkg-config = "0.3"

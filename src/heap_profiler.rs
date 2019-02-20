@@ -34,7 +34,6 @@ lazy_static! {
     });
 }
 
-#[link(name = "tcmalloc")]
 #[allow(non_snake_case)]
 extern "C" {
     fn HeapProfilerStart(fname: *const c_char);
