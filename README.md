@@ -75,6 +75,8 @@ To use the heap profiler, a custom allocator is used. This feature requires sett
 
 You can find additional documentation about heap profiling [here](https://gperftools.github.io/gperftools/heapprofile.html).
 
+For a reproducible example of the heap profiler used on the [`rust-fil-proofs`](https://github.com/filecoin-project/rust-fil-proofs) repository see the [`rust-fil-proofs-profile`](https://hub.docker.com/r/schomatis/rust-fil-proofs-profile) Docker image.
+
 ### Analyzing the profile
 
 To analyze the profile use Google's [pprof](https://github.com/google/pprof) tool.
